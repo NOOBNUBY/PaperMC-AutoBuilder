@@ -1,5 +1,6 @@
 package com.noobnuby
 
+import com.sun.tools.javac.Main
 import org.json.JSONObject
 import java.awt.*
 import java.io.*
@@ -8,7 +9,8 @@ import java.net.URL
 import java.nio.channels.Channels
 import javax.swing.*
 
-
+var isError = false
+var ErrorText = ""
 fun main() {
 
     //TODO 파일 다운
@@ -75,16 +77,29 @@ fun main() {
     installButton.setBounds(50, 300, 200, 40)
     installButton.font = font
     installButton.addActionListener {
-        downloadFile(lastVersion(),path)
-        settingEula(path)
+        downloadFile(lastVersion())
+        settingEula()
         if(isRadioMac) {
-            settingFile(path,8,true)
+            settingFile(8,true)
         }
         else {
-            settingFile(path,8,false)
+            settingFile(8,false)
+        }
+        if(!isError) {
+            JOptionPane.showMessageDialog(null, "완료되었습니다.")
+        }
+        else {
+            JOptionPane.showMessageDialog(null, "${ErrorText}\n관리자한테 이 메시지를 전달해주세요", "ERROR", JOptionPane.ERROR_MESSAGE)
+            isError = false
         }
     }
     frame.add(installButton)
+
+    val byText = JLabel("© Copyright 2023 noobnuby. All Rights Reserved.")
+    byText.setBounds(115, 380, 200, 50)
+    byText.font = fontLoad.deriveFont(7f)
+    frame.add(byText)
+
     frame.isVisible = true
 }
 
@@ -123,17 +138,19 @@ fun api(url:String): Any {
         return obj
     } catch (e: Exception) {
         e.printStackTrace()
+        isError = true
+        ErrorText = e.toString()
     }
     return false
 }
 
-fun settingFile(path:String,maxRam:Int,isMac:Boolean) {
+fun settingFile(maxRam:Int,isMac:Boolean) {
     try {
         if(isMac) {
             val file = File("start.sh")
             file.createNewFile()
             val pw = PrintWriter(file)
-            pw.print("java -Xmx${maxRam} -jar server.jar nogui")
+            pw.print("java -Xmx${maxRam}G -jar server.jar nogui")
 
             pw.close()
         }
@@ -141,17 +158,19 @@ fun settingFile(path:String,maxRam:Int,isMac:Boolean) {
             val file = File("start.bat")
             file.createNewFile()
             val pw = PrintWriter(file)
-            pw.print("java -Xmx${maxRam} -jar server.jar nogui\npause")
+            pw.print("java -Xmx${maxRam}G -jar server.jar nogui\npause")
 
             pw.close()
         }
     }
     catch (e:Exception) {
         e.printStackTrace()
+        isError = true
+        ErrorText = e.toString()
     }
 }
 
-fun settingEula(path:String) {
+fun settingEula() {
     try {
         val eulaFile = File("eula.txt")
         eulaFile.createNewFile()
@@ -162,19 +181,23 @@ fun settingEula(path:String) {
     }
     catch (e:Exception) {
         e.printStackTrace()
+        isError = true
+        ErrorText = e.toString()
     }
 }
 
-fun downloadFile(url: String, path: String) {
+fun downloadFile(url: String) {
     try {
         val rbc = Channels.newChannel(URL(url).openStream())
-        val downloadFile = File(path, "server.jar")
+        val downloadFile = File("server.jar")
 
         FileOutputStream(downloadFile).use { fos ->
             fos.channel.transferFrom(rbc, 0, Long.MAX_VALUE)
         }
     } catch (e: Exception) {
         e.printStackTrace()
+        isError = true
+        ErrorText = e.toString()
     }
 }
 
