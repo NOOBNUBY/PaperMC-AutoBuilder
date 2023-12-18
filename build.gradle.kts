@@ -13,6 +13,7 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
+    implementation("org.json:json:20210307")
 }
 
 tasks.test {
