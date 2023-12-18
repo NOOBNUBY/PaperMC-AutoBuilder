@@ -2,11 +2,11 @@ package com.noobnuby
 
 import org.json.JSONObject
 import java.awt.*
-import java.io.BufferedReader
-import java.io.InputStream
-import java.io.InputStreamReader
+import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
+import java.nio.channels.Channels
+import java.nio.channels.ReadableByteChannel
 import javax.swing.*
 
 
@@ -76,7 +76,8 @@ fun main() {
     installButton.setBounds(50, 300, 200, 40)
     installButton.font = font
     installButton.addActionListener {
-        lastVersion()
+        downloadFile(lastVersion(),path)
+        settingEula(path)
         if(isRadioMac) {
 
         }
@@ -91,16 +92,10 @@ fun main() {
 fun lastVersion(): String {
     val verObj = api("https://api.papermc.io/v2/projects/paper/") as JSONObject
     val versions = verObj.getJSONArray("versions")
-    val version = verObj.getJSONArray("versions").getString(verObj.getJSONArray("versions").length() - 1)
-    val buildObj = api("https://api.papermc.io/v2/projects/paper/versions/1.20.4/builds") as JSONObject
+    val version = versions.getString(versions.length() - 1)
+    val buildObj = api("https://api.papermc.io/v2/projects/paper/versions/${version}") as JSONObject
     val builds = buildObj.getJSONArray("builds")
-    val buildArr = arrayListOf<Int>()
-    for(i in 0 until builds.length()) {
-        val item = builds.getJSONObject(i)
-        val buildValue = item.getInt("build")
-        buildArr.add(buildValue)
-    }
-    val build = buildArr.last()
+    val build = builds.getInt(builds.length() - 1)
     val lastVerURL = "https://api.papermc.io/v2/projects/paper/versions/${version}/builds/${build}/downloads/paper-${version}-${build}.jar"
     return lastVerURL
 }
@@ -133,8 +128,35 @@ fun api(url:String): Any {
     return false
 }
 
-fun settingFile(path:String) {
+fun settingFile(path:String,maxRam:String,isMac:Boolean) {
 
+}
+
+fun settingEula(path:String) {
+    try {
+        val eulaFile = File("eula.txt")
+        eulaFile.createNewFile()
+
+        val pw = PrintWriter(eulaFile)
+        pw.print("eula=true")
+        pw.close()
+    }
+    catch (e:Exception) {
+        e.printStackTrace()
+    }
+}
+
+fun downloadFile(url: String, path: String) {
+    try {
+        val rbc = Channels.newChannel(URL(url).openStream())
+        val downloadFile = File(path, "server.jar")
+
+        FileOutputStream(downloadFile).use { fos ->
+            fos.channel.transferFrom(rbc, 0, Long.MAX_VALUE)
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
 }
 
 class RoundedButton : JButton {

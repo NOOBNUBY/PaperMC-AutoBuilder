@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.plugin.extraProperties
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -5,7 +6,7 @@ plugins {
 }
 
 group = "com.noobnuby"
-version = "1.0-SNAPSHOT"
+version = property("version")!!
 
 repositories {
     mavenCentral()
@@ -31,7 +32,8 @@ tasks.withType<Jar>{
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from(sourceSets.main.get().output)
     dependsOn(configurations.runtimeClasspath)
-    archiveFileName.set("PaperMCAutoBuilder.jar")
+    archiveBaseName.set(rootProject.name)
+    archiveClassifier.set("")
     from({
         configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
     })
