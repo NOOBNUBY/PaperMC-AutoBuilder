@@ -6,7 +6,6 @@ import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
 import java.nio.channels.Channels
-import java.nio.channels.ReadableByteChannel
 import javax.swing.*
 
 
@@ -79,10 +78,10 @@ fun main() {
         downloadFile(lastVersion(),path)
         settingEula(path)
         if(isRadioMac) {
-
+            settingFile(path,8,true)
         }
         else {
-
+            settingFile(path,8,false)
         }
     }
     frame.add(installButton)
@@ -128,8 +127,28 @@ fun api(url:String): Any {
     return false
 }
 
-fun settingFile(path:String,maxRam:String,isMac:Boolean) {
+fun settingFile(path:String,maxRam:Int,isMac:Boolean) {
+    try {
+        if(isMac) {
+            val file = File("start.sh")
+            file.createNewFile()
+            val pw = PrintWriter(file)
+            pw.print("java -Xmx${maxRam} -jar server.jar nogui")
 
+            pw.close()
+        }
+        else {
+            val file = File("start.bat")
+            file.createNewFile()
+            val pw = PrintWriter(file)
+            pw.print("java -Xmx${maxRam} -jar server.jar nogui\npause")
+
+            pw.close()
+        }
+    }
+    catch (e:Exception) {
+        e.printStackTrace()
+    }
 }
 
 fun settingEula(path:String) {
