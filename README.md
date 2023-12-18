@@ -3,7 +3,7 @@ PaperMCAutoBuilder
 ### <span style="color: #ffd257"> 누구나 손 쉽게 서버를 만들 수 있습니다.</span>
 PaperMCAutoBuilder가 최신버전의 버킷을 자동으로 가져옵니다.   
 
-__<span style="color: #fc4444">[ <span style="color: #ffd33d">!</span> ]</span>__ PaperMCAutoBuilder는 자바17을 지원하는 1.18 ~ 최신버전만 지원합니다.
+__<span style="color: #fc4444">[ <span style="color: #ffd33d">!</span> ]</span>__ PaperMCAutoBuilder는 자바17로 실행됩니다.
 
 Use
 =
