@@ -73,7 +73,7 @@ fun main() {
     radioGroup.elements
 
     //Create installButton
-    val installButton = JButton("Install")
+    val installButton = RoundedButton("Install")
     installButton.setBounds(50, 300, 200, 40)
     installButton.font = font
     installButton.addActionListener {
